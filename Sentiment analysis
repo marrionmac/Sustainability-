@@ -1,0 +1,28 @@
+mydata <- read_csv("~/Downloads/textdataTweets.csv")
+library(tidyverse)
+library(tidytext)
+
+#unnest tokens
+mycounts <- mydata %>% select(text) %>% unnest_tokens(input=text,output="word") %>% group_by(word) %>% summarise(wordcount=n()) %>% arrange(desc(wordcount))
+mycounts
+
+#remove stop words
+mycounts <- mydata %>% select(text) %>% unnest_tokens(input=text,output="word") %>% group_by(word) %>% summarise(wordcount-n()) %>% arrange(desc(wordcount)) %>% anti_join(stop_words)
+mycounts <- mydata %>% select(text) %>% unnest_tokens(input=text,output="word") %>% group_by(word) %>% summarise(wordcount=n()) %>% arrange(desc(wordcount)) %>% anti_join(stop_words)
+View(mycounts) 
+mycounts <- mydata %>% select(text) %>% unnest_tokens(input=text,output="word") %>% group_by(word) %>% summarise(wordcount=n()) %>% arrange(desc(wordcount)) %>% anti_join(stop_words) 
+
+#inner_join with sentiments
+mycounts %>% inner_join(sentiments) %>% count()
+
+mydata %>% unnest_tokens(input="text",output="word") %>% inner_join(sentiments) %>% count(lineno=1:741, sentiment) %>% filter(sentiment=="negative")
+mydata %>% unnest_tokens(input="text",output="word") %>% inner_join(sentiments) %>% count(lineno=1:741, sentiment) %>% filter(sentiment=="positive")
+
+mydata %>% unnest_tokens(input="text", output="word") %>% inner_join(sentiments) %>% count(lineno=1:741, sentiment) %>% spread(key=sentiment, value=n)
+
+mydata %>% unnest_tokens(input="text", output="word") %>% inner_join(sentiments) %>% count(lineno=1:741, sentiment) %>% spread(key=sentiment, value=n, fill=0)
+
+mydata %>% unnest_tokens(input="text", output="word") %>% inner_join(sentiments) %>% count(lineno=1:741, sentiment) %>% spread(key=sentiment, value=n, fill=0) %>% mutate(sentiment=positive-negative)
+
+mydata %>% unnest_tokens(input="text", output="word") %>% inner_join(sentiments) %>% count(lineno=1:741, sentiment) %>% spread(key=sentiment, value=n, fill=0) %>% mutate(sentiment=positive-negative) %>% select(lineno, sentiment)
+
